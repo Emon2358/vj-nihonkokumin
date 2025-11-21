@@ -1,0 +1,31 @@
+name: build-processed-video
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system deps and Python packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          pip install moviepy numpy pillow imageio imageio-ffmpeg
+
+      - name: Download source video
+        run: |
+          curl -L -o source.mp4 https://raw.githubusercontent.com/Emon2358/4949downloader/main/downloads/sm2732030.mp4
+
+      - name: Run video processing
+        run: |
+          python process_video.py source.mp4 output.mp4
+
+      - name: Upload processed video
+        uses: actions/upload-artifact@v4
+        with:
+          name: processed-video
+          path: output.mp4
